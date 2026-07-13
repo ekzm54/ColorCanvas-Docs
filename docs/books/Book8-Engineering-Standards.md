@@ -2,39 +2,57 @@
 
 ## Purpose
 
-Book 8 defines concrete coding standards for AI-generated implementation.
+Book 8 defines concrete coding standards for AI-generated Android implementation.
 
 ## Required Practices
 
-- Swift 6-ready code.
-- Strict concurrency where practical.
+- Kotlin with Gradle Kotlin DSL.
+- Jetpack Compose and Material 3.
+- Coroutines and Flow for asynchronous state.
+- Android ViewModel.
 - MVVM + Clean Architecture.
 - Repository Pattern.
-- Command Pattern for toolbar actions.
+- Command or event pattern for toolbar actions.
 - Dependency Injection.
 - State-driven UI.
 - Design Token usage.
+- Offline-first persistence.
 
 ## Forbidden
 
-- Force unwrap.
-- `try!`.
-- Empty `catch`.
+- Business logic inside composables.
+- Composables accessing files, databases, repositories, or engines directly.
+- Core engines depending on Compose UI.
 - Silent failure.
-- `View` accessing `FileManager`.
-- `View` calling engines directly.
-- `Engine` importing SwiftUI.
-- Magic numbers.
-- Hard-coded strings in production UI.
+- Empty exception handling.
+- Hard-coded design values outside token definitions.
+- Hard-coded production strings outside resources.
+- Blocking IO on the main thread.
+- iOS, SwiftUI, UIKit, CoreGraphics, or Metal-specific code.
 
 ## Module Boundary Rule
 
 ```text
-ColorCanvasUI -> ColorCanvasApplication -> ColorCanvasDomain
-ColorCanvasApplication -> Repository Protocols / Engine Protocols
-ColorCanvasData -> Document / FileSystem Adapter
-ColorCanvasCanvasEngine -> Rendering / Viewport / Stroke
-ColorCanvasSafeColor -> Region / Mask / Gap Repair
+:app -> :feature:* -> :core:domain
+:feature:* -> :core:designsystem / :core:ui / :core:common
+:core:data -> :core:domain
+:core:canvas -> rendering / viewport / stroke
+:core:safecolor -> region / mask / gap repair
+:core:document -> project package and persistence
+:core:export -> PNG / PDF / sharing payload
 ```
+
+## UI State Rule
+
+- Screen state must be represented with immutable data classes and sealed interfaces/classes where appropriate.
+- Composables receive state and callbacks.
+- One-shot effects must use an explicit effect/event channel.
+
+## Testing Rule
+
+- Unit tests for ViewModels, UseCases, repositories, and engines.
+- Compose UI tests for user flows.
+- Instrumented tests only where Android framework behavior is required.
+- Rendering and Safe Color core logic should remain JVM-testable where practical.
 
 Engines must not depend on UI.
